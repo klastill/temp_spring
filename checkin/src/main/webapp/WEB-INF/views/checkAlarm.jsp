@@ -24,7 +24,7 @@ tr>td>img {
 	<c:choose>
 		<c:when test="${ses_memberID ne null && ses_memberID ne '' }">
 		<c:choose>
-			<c:when test="${ses_memberID eq avo.memberID }">
+			<c:when test="${ses_memberID eq alarmList[0].memberID }">
 					<!-- Breadcrumb Section Begin -->
 			<section class="breadcrumb-section set-bg"
 				data-setbg="/resources/img/book-diary-bookmark.jpg"
@@ -95,11 +95,11 @@ tr>td>img {
 			</section>
 			</c:when>
 			<c:otherwise>
-				<script>
+			<script>
 				alert("본인의 알람만 확인가능합니다.")
 				location.replace("/");
 			</script>
-			</c:otherwise>
+		</c:otherwise>
 			</c:choose>
 		</c:when>
 		<c:otherwise>

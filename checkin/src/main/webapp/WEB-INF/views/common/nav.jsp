@@ -22,7 +22,7 @@
 					class="cartCheck"><i class="fa fa-shopping-bag"></i> <span
 						class="cartCount"></span></a></li>
 				<li><a href="#"><i	class="fa fa-bell"></i><span class="alarmCount"></span></a></li>
-				<form action="/checkAlarm" method="post" class="caForm">
+				<form action="/checkAlarm" method="get" class="caForm">
 					<input type="hidden" name="mid" value="${ses_memberID }">
 					  <input type="hidden" name="${_csrf.parameterName }"
                            value="${_csrf.token }">

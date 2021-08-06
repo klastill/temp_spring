@@ -51,7 +51,7 @@ public class HomeController {
 		return "home";
 	}
 	
-	@RequestMapping(value = "/checkAlarm", method = RequestMethod.POST)
+	@RequestMapping(value = "/checkAlarm", method = RequestMethod.GET)
 	public String alarm(Model model, @RequestParam("mid") String memberID) {
 		model.addAttribute("alarmList", adao.getAlarmList(memberID));
 		return "/checkAlarm";
