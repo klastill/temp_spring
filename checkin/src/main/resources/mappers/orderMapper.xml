@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderMapper">
+
+	<insert id="reg" parameterType="ovo">
+		insert into tbl_order
+		(memberid,memberemail,price,phonenum,zipcode,roadaddress,addressdetail,membername,mileage,demand)
+		values(#{memberid},#{memberemail},#{price},#{phonenum},#{zipcode},#{roadAddress},#{addressDetail},#{memberName},#{mileage},#{demand})
+	</insert>
+	<insert id="add" parameterType="hashmap">
+		insert into tbl_orderinfo(orderno,isbn,qty,bname,price,cover,mileage)
+		values(#{orderno},#{isbn},#{qty},#{bname},#{price},#{cover},#{mileage})
+	</insert>
+
+	<select id="detail" parameterType="int" resultType="ovo">
+		select * from
+		tbl_order where orderno=#{orderno}
+	</select>
+	<select id="idx" resultType="int">
+		<!-- select tbl_order_SEQ.currval from dual -->
+		select max(orderno) from tbl_order
+	</select>
+	<select id="odlist" parameterType="String" resultType="odto">
+		SELECT
+		to2.ORDERNO AS ono,to2.MEMBERID AS mid ,to3.PRICE AS
+		price,to2.PRICE AS totalprice,to2.REGDATE AS regdate,to3.idx as infono, to2.mileage as mileage,
+		to3.BNAME AS bname, to3.ISBN AS isbn, to3.COVER AS cover,to3.QTY AS qty
+		FROM TBL_ORDER to2 INNER JOIN TBL_ORDERINFO to3
+		ON to2.ORDERNO =to3.ORDERNO AND to2.MEMBERID =#{memberid} ORDER BY REGDATE DESC 
+	</select>
+	<select id="oddetail" parameterType="int" resultType="odto">
+		SELECT to2.ORDERNO AS ono,to2.MEMBERID AS mid ,to3.PRICE AS price,to2.REGDATE AS regdate, to2.demand as demand,
+		to3.BNAME AS bname,to2.PRICE AS totalprice, to3.ISBN AS isbn,to2.membername as membername,to3.mileage as mileage,
+		to3.COVER AS cover,to3.QTY AS qty,to3.idx as infono	FROM TBL_ORDER to2 INNER JOIN TBL_ORDERINFO to3 
+		ON to2.ORDERNO =to3.ORDERNO AND to2.ORDERNO=#{orderno} ORDER BY REGDATE DESC
+	</select>
+
+	<delete id="del" parameterType="int">
+		delete from tbl_order where
+		orderno=#{orderno}
+	</delete>
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ReviewMapper">
+<sql id="bc">
+	from tbl_review where rno>0
+</sql>
+<sql id="search">
+	<if test="range != null" >
+		<trim prefix="and(" suffix=")">
+			<choose>
+				<when test="range == 'reviewTitle'.toString()">
+					title like CONCAT('%',#{keyword},'%')
+				<!-- 	title like '%'||#{keyword}||'%' -->
+				</when>
+			</choose>
+		</trim>
+	</if>
+</sql> 
+<!-- 리뷰등록 oracle  -->
+<!-- 	<insert id="reg" parameterType="rvo">
+		insert into tbl_review
+		(rno,mno, memberID, title,content,recommend,bname,link,cover,isbn) 
+		values (tbl_review_seq.nextval,#{mno},#{memberID},#{title},#{content},#{recommend},#{bname},#{link},#{cover},#{isbn})
+	</insert>
+	리뷰등록 
+	<insert id="reg2" parameterType="rvo">
+		insert into tbl_review
+		(rno,mno, memberID, title,content,recommend,bname,link,cover,isbn,content2) 
+		values (tbl_review_seq.nextval,#{mno},#{memberID},#{title},#{content},#{recommend},#{bname},#{link},#{cover},#{isbn},#{content2})
+	</insert> -->
+	
+	<!-- 리뷰등록 mysql  -->
+	<insert id="reg" parameterType="rvo"><!--  -->
+		insert into tbl_review
+		(mno, memberID, title,content,recommend,bname,link,cover,isbn) 
+		values (#{mno},#{memberID},#{title},#{content},#{recommend},#{bname},#{link},#{cover},#{isbn})
+	</insert>
+	<!-- 리뷰등록  -->
+	<insert id="reg2" parameterType="rvo"><!--  -->
+		insert into tbl_review
+		(mno, memberID, title,content,recommend,bname,link,cover,isbn,content2) 
+		values (#{mno},#{memberID},#{title},#{content},#{recommend},#{bname},#{link},#{cover},#{isbn},#{content2})
+	</insert>
+<!-- 전체 리뷰 -->	
+	<select id="list" parameterType="pgvo" resultType="rvo"><!--  -->
+		select * from tbl_review order by rno desc
+<!--   	select * from (select /*+INDEX_DESC(tbl_review PK_tbl_review)*/
+  	rownum as rn,rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover,readCount,isbn <include refid="bc"/> 
+  	<![CDATA[
+  	and rownum<=#{pageIndex}*10)
+  	where rn>(#{pageIndex}-1)*10
+  	]]> -->
+  </select>
+ <!--인기순 리뷰  -->
+  <select id="favorlist" parameterType="pgvo" resultType="rvo"><!--  -->
+   select * from tbl_review order by likey desc,readCount desc 
+<!--   	select * from (select /*+INDEX_DESC(tbl_review PK_tbl_review)*/
+  	rownum as rn,rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover,readCount,isbn <include refid="bc"/> 
+  	<![CDATA[
+  	and rownum<=#{pageIndex}*10)
+  	where rn>(#{pageIndex}-1)*10 order by likey desc,readCount desc
+  	]]> -->
+  </select>
+ <!--마이 리스트  --> 
+   	<select id="mylist" parameterType="hashmap" resultType="rvo"><!--  -->
+   		select * from tbl_review where mno=#{mno} order by likey desc,readCount desc
+<!--  	select * from (select /*+INDEX_DESC(tbl_review pk_review) */
+ 	rownum as rn,rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover,readCount,isbn from tbl_review where mno=#{mno}
+ 	<![CDATA[
+ 	 and rownum <=#{pageIndex} *10)
+ 	 where rn >(#{pageIndex}-1)*10 order by rno desc
+ 	]]> -->
+ 	</select>
+ <!--연관된 상품  relatedList -->
+ 	<select id="relatedList" parameterType="hashmap" resultType="rvo"><!--  -->
+ 	 	select * from tbl_review where mno=#{mno} and rno not in(#{rno})
+ 	  order by likey desc,readCount desc limit 4
+<!--  	select * from (select /*+INDEX_DESC(tbl_review pk_review) */
+ 	rownum as rn,rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover,readCount,isbn from tbl_review where mno=#{mno} and rno not in(#{rno})
+ 	<![CDATA[
+ 	 and rownum <=4) order by likey desc,readCount desc
+ 	]]> -->
+ 	</select>
+ 	<!-- 리뷰 제목으로 검색 -->
+ 	<select id="kwList" parameterType="pgvo" resultType="rvo"><!--  -->
+ 	  select * from tbl_review where title like CONCAT('%',#{keyword},'%')
+  	
+<!--   	select * from (select /*+INDEX_DESC(tbl_review PK_tbl_review)*/
+  	rownum as rn,rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover,readCount,isbn <include refid="bc"/> 
+  	 <include refid="search"/>
+  	<![CDATA[
+  	and rownum<=#{pageIndex}*10)
+  	where rn>(#{pageIndex}-1)*10
+  	]]>   -->
+  </select>
+<!-- 리뷰디테일 -->
+	<select id="detail" parameterType="int" resultType="rvo"><!--  -->
+		select rno,mno,memberID,title,content,date_format(regdate,'%Y-%m-%d') as regdate,likey,bname,recommend,link,cover,readCount,isbn,content2 from tbl_review where rno=#{rno}
+<!-- 		select rno,mno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover,readCount,isbn,content2 from tbl_review where rno=#{rno} -->
+</select>
+
+<!-- 리뷰 좋아요 탑3 리스트  -->	
+   <select id="getBestLike" resultType="rvo"><!--  -->
+   	select * from (select rno,memberID,title,content,date_format(regdate,'%Y-%m-%d') as regdate,likey,
+		bname,recommend,link,cover from tbl_review order by likey desc) c
+		limit 4
+<!-- 		select * from (select rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,
+		bname,recommend,link,cover from tbl_review order by likey desc) 
+		where <![CDATA[rownum <= 4]]> -->
+	</select>
+<!-- 리뷰 별점 탑3 리스트 -->	
+	<select id="getBestRecommend" resultType="rvo"><!--  -->
+		select * from (select rno,memberID,title,content,date_format(regdate,'%Y-%m-%d') as regdate,likey,
+		bname,recommend,link,cover from tbl_review order by recommend desc) c
+		limit 4
+<!-- 		select * from (select rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,
+		bname,recommend,link,cover from tbl_review order by recommend desc) 
+		where <![CDATA[rownum <= 4]]> -->
+	</select>
+	
+<!-- by 고영빈 d:0712 #2 -->
+<!-- 도서별 별점 탑3 리스트 -->	
+	<select id="getBnameRecommend" parameterType="string" resultType="rvo"><!--  -->
+		select * from (select rno,memberID,title,content,date_format(regdate,'%Y-%m-%d') as regdate,likey,bname,recommend,link,cover from tbl_review where isbn=#{isbn} order by recommend desc) c
+		limit 3
+		<!-- select * from (select rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover from tbl_review where isbn=#{isbn} order by recommend desc) where <![CDATA[rownum <= 3]]>  -->
+	</select>
+	
+<!-- by 고영빈 d:0715 #1 -->
+<!-- 도서검색 -->
+<select id="searchedList" parameterType="hashmap" resultType="rvo"><!--  -->
+ 	select * from tbl_review where isbn=#{isbn}
+<!--  	select * from (select /*+INDEX_DESC(tbl_review pk_review) */
+ 	rownum as rn,rno,memberID,title,content,to_char(regdate,'YYYY-MM-DD') as regdate,likey,bname,recommend,link,cover from tbl_review where isbn=#{isbn}
+ 	<![CDATA[
+ 	 and rownum <=#{pageIndex} *10)
+ 	 where rn >(#{pageIndex}-1)*10
+ 	]]> -->
+ 	</select>
+<select id="reviewCount" parameterType="int" resultType="int"><!--  -->
+	select count(*) from tbl_review where mno=#{mno}
+</select>
+<select id="countKw" parameterType="pgvo" resultType="int"><!--  -->
+	select count(*) from tbl_review where title like CONCAT('%',#{keyword},'%')
+	<!-- select count(*) from tbl_review where title like '%'||#{keyword}||'%' -->
+</select>
+
+<!-- 리뷰 수정 --> 
+   <update id="mod" parameterType="rvo"><!--  -->
+		update tbl_review set title=#{title}, content=#{content},recommend=#{recommend}
+		where rno=#{rno}
+	</update>
+	<!-- 리뷰 수정 --> 
+   <update id="mod2" parameterType="rvo"><!--  -->
+		update tbl_review set title=#{title}, content=#{content},recommend=#{recommend},content2=#{content2}
+		where rno=#{rno}
+	</update>
+<!-- 리뷰 좋아요 숫자 올리기 --> 	
+	<update id="updownlike" parameterType="hashmap"><!--  -->
+		update tbl_review set likey=likey + #{qty} where rno=#{rno}
+	</update>
+<!-- 조회수 올리기  --> 	
+	<update id="uprc" parameterType="hashmap"><!--  -->
+	update tbl_review set readCount=readCount+ #{qty} where rno=#{rno}
+	</update>
+<!-- 리뷰 삭제 -->   
+	<delete id="del" parameterType="int"><!--  -->
+		delete from tbl_review where rno=#{rno}
+	</delete>
+<!--리뷰 페이징 총 갯수 -->
+	<select id="tc" parameterType="pgvo" resultType="int"><!--  -->
+ 	<![CDATA[
+ 		select count(rno) as cnt from tbl_review where rno> 0
+ 	]]>
+	</select>
+<!--리뷰 내가쓴글 페이징 총 갯수  -->
+	<select id="mytc" parameterType="hashmap" resultType="int"><!--  -->
+ 	<![CDATA[
+ 		select count(rno) as cnt from tbl_review where mno=#{mno}
+ 	]]>
+	</select>
+	<select id="stc" parameterType="hashmap" resultType="int"><!--  -->
+ 	<![CDATA[
+ 		select count(rno) as cnt from tbl_review where isbn=#{isbn}
+ 	]]>
+	</select>
+</mapper>

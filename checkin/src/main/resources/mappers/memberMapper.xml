@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="MemberMapper">
+  	<sql id="bc">
+  		from tbl_member where memberID=#{memberID}
+  	</sql>
+ <!-- 	<sql id="search">
+ 	<if test="range != null" >
+		<trim prefix="and(" suffix=")">
+			<choose>
+				<when test="range == 'total'.toString()">
+					memberID like '%'||#{keyword}||'%' or
+					memberName like '%'||#{keyword}||'%'
+				</when>
+				<when test="range == 'mID'.toString()">
+					memberID like '%'||#{keyword}||'%'
+				</when>
+				<when test="range == 'mN'.toString()">
+					memberName like '%'||#{keyword}||'%' 
+				</when>
+			</choose>
+		</trim>
+	</if>
+</sql>    -->	
+<sql id="search">
+	<if test="range != null" >
+		<trim prefix="and(" suffix=")">
+			<choose>
+				<when test="range == 'total'.toString()">
+					memberID like CONCAT('%',#{keyword},'%')  or
+					memberName like CONCAT('%',#{keyword},'%') 
+				</when>
+				<when test="range == 'mID'.toString()">
+					memberID like CONCAT('%',#{keyword},'%') 
+				</when>
+				<when test="range == 'mN'.toString()">
+					memberName like CONCAT('%',#{keyword},'%') 
+				</when>
+			</choose>
+		</trim>
+	</if>
+</sql> 
+<!--   	 <insert id="reg" parameterType="mvo">
+  		insert into tbl_member(mno, memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail)
+  		values (tbl_member_SEQ.nextval, #{memberID}, #{memberPassword}, #{memberName}, #{memberGender}, #{memberEmail}, #{memberPhone}, #{memberBirth}, #{zipcode}, #{roadAddress}, #{addressDetail})
+  	</insert> -->
+  	<insert id="reg" parameterType="mvo">
+  		insert into tbl_member(memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail)
+  		values (#{memberID}, #{memberPassword}, #{memberName}, #{memberGender}, #{memberEmail}, #{memberPhone}, #{memberBirth}, #{zipcode}, #{roadAddress}, #{addressDetail})
+  	</insert>
+  	<select id="check" parameterType="String" resultType="int">
+  		select count(memberID) as cnt <include refid="bc"/>
+  	</select>
+<!--   	<select id="list" resultType="mvo" parameterType="pgvo">
+  		<![CDATA[
+ 		select mno,memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail, enabled, failcnt
+ 		from (select /*+INDEX(tbl_member pk_member)*/
+ 				rownum as rn,mno, memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail, enabled, failcnt
+ 			from tbl_member 
+ 			where memberID is not null
+ 	]]>
+ 		 <include refid="search"/>
+	<![CDATA[
+ 			and rownum <= #{pageIndex} * #{countPerPage})
+ 		where rn > (#{pageIndex}-1) * #{countPerPage}
+ 	]]>
+  	</select> -->
+  	<select id="list" resultType="mvo" parameterType="pgvo">
+  		<![CDATA[
+ 		select * from tbl_member where memberID is not null 
+ 	]]>
+ 		 <include refid="search"/> order by mno desc
+  	</select>
+  <!-- 	<select id="membersearch" resultType="mvo" parameterType="pgvo">
+  		<![CDATA[
+ 		select mno,memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail
+ 		from (select /*+INDEX(tbl_member pk_member)*/
+ 				rownum as rn,mno, memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail
+ 			from tbl_member 
+ 			where memberID is not null
+ 	]]>
+ 		 <include refid="search"/>
+	<![CDATA[
+ 			and rownum <= #{pageIndex} * #{countPerPage})
+ 		where rn > (#{pageIndex}-1) * #{countPerPage}
+ 	]]>
+  	</select> -->
+  		<select id="membersearch" resultType="mvo" parameterType="pgvo">
+  		<![CDATA[
+ 		select mno,memberID, memberPassword, memberName, memberGender, memberEmail, memberPhone, memberBirth, zipcode, roadAddress, addressDetail
+ 		from tbl_member where memberID is not null
+ 	]]>
+ 		 <include refid="search"/> order by mno desc
+  	</select>
+  	<select id="login" parameterType="mvo" resultType="mvo">
+  		select * <include refid="bc"/> and memberPassword=#{memberPassword}
+  	</select>
+	<select id="detail" parameterType="String" resultType="mvo">
+		select * <include refid="bc"/>
+	</select>
+	<select id="detailbymno" parameterType="int" resultType="mvo">
+		select * from tbl_member where mno=#{mno}
+	</select>
+	
+	 	<select id="tc" parameterType="pgvo" resultType="int">
+ 		select count(memberID) as cnt from tbl_member
+ 		where memberID is not null
+ 		<include refid="search"/>
+ 	</select>
+ 	<!-- <select id="curr" resultType="int">
+ 		select tbl_member_seq.currval from dual
+ 	</select> -->
+ 	<select id="curr" resultType="int">
+ 		select max(mno) from tbl_member
+ 	</select>
+ 	<select id="nowMileage" parameterType="String" resultType="int">
+ 		select mileage from tbl_member where memberID=#{memberID}
+ 	</select>
+ 	<select id="fc" parameterType="String" resultType="int">
+ 		select failcnt <include refid="bc"/>
+ 	</select>
+  	<update id="mod" parameterType="mvo">
+  		update tbl_member set memberPassword=#{memberPassword}, memberName=#{memberName}, memberGender=#{memberGender}, memberEmail=#{memberEmail}, memberPhone=#{memberPhone}, memberBirth=#{memberBirth}, zipcode=#{zipcode}, roadAddress=#{roadAddress}, addressDetail=#{addressDetail}
+  		where memberID=#{memberID}
+  	</update>
+  	<update id="upmile" parameterType="mvo">
+  		update tbl_member set mileage= mileage+#{mileage} where memberid=#{memberID}
+  	</update>
+  	<update id="upfc" parameterType="String">
+  		update tbl_member set failcnt = failcnt + 1 where memberID = #{memberID}
+  	</update>
+  	<update id="lock" parameterType="hashmap">
+  		update tbl_member set enabled = #{value} where memberID=#{memberID}
+  	</update>
+  	<update id="rsfc" parameterType="String">
+  		update tbl_member set failcnt = 0 where memberID=#{memberID}	
+  	</update>
+  	<update id="cgea" parameterType="int"> 
+  		update tbl_member set enabled = 1, failcnt=0 where mno=#{mno}
+  	</update>
+  	<delete id="del" parameterType="int">
+  		delete from tbl_member where mno=#{mno}
+  	</delete>
+  </mapper>

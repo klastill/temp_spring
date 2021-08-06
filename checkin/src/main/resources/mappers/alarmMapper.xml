@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AlarmMapper">
+<insert id="reg" parameterType="avo">
+	insert into tbl_alarm (alarmdata,rnolink,status,memberID) values(#{alarmdata},#{rnolink},#{status},#{memberID})
+</insert>
+<select id="list" parameterType="String" resultType="avo">
+	select * from tbl_alarm where memberID=#{memberID} ORDER BY regdate desc
+</select>
+<select id="count" parameterType="String" resultType="int">
+	select count(ano) from tbl_alarm where memberID=#{memberID} and status=0
+</select>
+
+<update id="checkAlarm" parameterType="int">
+	update tbl_alarm set status= 1 where ano=#{ano}
+</update>
+
+</mapper>

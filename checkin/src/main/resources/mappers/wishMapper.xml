@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WishMapper">
+
+<!-- <insert id="register" parameterType="wvo">
+	insert into tbl_wish(wishno, mno, bname, cover, price, isbn, author, description)
+	values(tbl_wish_SEQ.nextval, #{mno}, #{bname}, #{cover}, #{price}, #{isbn}, #{author}, #{description})
+</insert> -->
+<insert id="register" parameterType="wvo">
+	insert into tbl_wish(mno, bname, cover, price, isbn, author, description)
+	values(#{mno}, #{bname}, #{cover}, #{price}, #{isbn}, #{author}, #{description})
+</insert>
+
+<delete id="remove" parameterType="hashmap">
+	DELETE FROM TBL_WISH WHERE mno=#{mno} AND isbn =#{isbn}
+</delete>
+
+<select id="wishList" parameterType="int" resultType="wvo">
+	<!-- select * from tbl_wish where mno=#{mno} AND rowid IN (SELECT max(rowid) FROM tbl_wish where mno=#{mno} GROUP BY isbn) ORDER BY wishno desc -->
+	select * from tbl_wish where mno=#{mno} AND wishno IN (SELECT max(wishno) FROM tbl_wish where mno=#{mno} GROUP BY isbn) ORDER BY wishno desc
+</select>
+
+<select id="count" parameterType="string" resultType="int">
+	<!-- select count(wishno) from tbl_wish where mno=#{mno} AND rowid IN (SELECT max(rowid) FROM tbl_wish GROUP BY isbn) -->
+	select count(wishno) from tbl_wish where mno=#{mno} AND wishno IN (SELECT max(wishno) FROM tbl_wish GROUP BY isbn)
+</select>
+</mapper>

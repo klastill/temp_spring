@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CartMapper">
+
+<insert id="add" parameterType="cavo">
+	insert into tbl_cart(memberid,bname,price,qty,isbn,cover,mileage) 
+	values(#{memberID},#{bname},#{price},#{qty},#{isbn},#{cover},#{mileage}) 
+</insert>
+
+<select id="list" parameterType="String" resultType="cavo">
+	select * from tbl_cart where memberid=#{memberID}
+</select>
+<select id="isin" parameterType="hashmap" resultType="cavo">
+	select * from tbl_cart where isbn=#{isbn} AND memberid=#{memberID}
+</select>
+<select id="count" parameterType="String" resultType="int">
+	select count(cartno) from tbl_cart where memberid=#{memberID}
+</select>
+
+<update id="upqty" parameterType="hashmap">
+	update tbl_cart set qty=qty+#{qty}, mileage=mileage+#{mileage} where cartno=#{cartno}
+</update>
+
+<delete id="del" parameterType="int">
+  	delete from tbl_cart where cartno=#{cartno}
+</delete>
+<delete id="delAll" parameterType="String">
+  	delete from tbl_cart where memberid=#{memberID}
+</delete>
+</mapper>

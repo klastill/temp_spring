@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SubscribeMapper">
+	<!-- 구독신청 oracle-->
+	<!-- <insert id="reg" parameterType="svo">
+		insert into tbl_subscribe
+		(subNo,sendNo, receiveNo, status) values (tbl_subscribe_seq.nextval,#{sendNo},#{receiveNo},'1')
+	</insert> -->
+	<!-- 구독신청 mysql -->
+	<insert id="reg" parameterType="svo">
+		insert into tbl_subscribe
+		(sendNo, receiveNo, status) values (#{sendNo},#{receiveNo},'1')
+	</insert>
+	<!-- 구독 리스트 출력(관리자용) -->
+	<select id="list" parameterType="int"
+		resultType="sdto">
+		select sendNo, sendId, sendNickname,sendFollowerNum,
+		receiveNo, receiveId, receiveNickname,receiveFollowerNum from
+		view_subscribe
+		where  receiveNo=#{mno} and status = 1
+	</select>
+	<!-- 구독 신청한 리스트 출력 -->
+	<select id="listSend" parameterType="int"
+		resultType="sdto">
+		select receiveNo, receiveId,
+		receiveNickname,receiveFollowingNum,receiveFollowerNum,sendNo from view_subscribe where sendNo
+		=#{mno} and status=1
+	</select>
+
+	<!-- 구독 신청받은 리스트 출력 -->
+	<select id="listReceived" parameterType="int"
+		resultType="sdto">
+		select sendNo, sendId, sendNickname,sendFollowingNum,sendFollowerNum,receiveNo from view_subscribe where receiveNo =#{mno} and status=1
+	</select>
+	<!--랭크4 리스트 listRank4 oracle -->
+	<!-- <select id="listRank4" resultType="sdto">
+		SELECT * FROM (
+		select receiveNo ,count(receiveNo) AS followerNum FROM TBL_SUBSCRIBE WHERE status=1 GROUP BY RECEIVENO ORDER BY followerNum DESC)
+		where<![CDATA[rownum <= 4]]>
+	</select> -->
+	
+	<!--랭크4 리스트 listRank4 mysql  -->
+	<select id="listRank4" resultType="sdto">
+		select receiveNo ,count(receiveNo) AS followerNum FROM tbl_subscribe WHERE status=1 GROUP BY RECEIVENO ORDER BY followerNum DESC
+		limit 4
+	</select>
+	
+	<!--팔로워 수  -->
+	<select id="followerNum" parameterType="int" resultType="int">
+	select count(*) from tbl_subscribe where receiveNo=#{sendNo} and status=1
+	</select>
+	<!--팔로잉 수  followingNum-->
+	<select id="followingNum" parameterType="int" resultType="int">
+	select count(*) from tbl_subscribe where sendNo=#{mno} and status=1
+	</select>
+	
+	<!-- 구독가능한지 확인 -->
+	<select parameterType="svo" id="subscribeCheck" resultType="svo">
+		select *
+		from tbl_subscribe where (sendNo = #{sendNo} and receiveNo
+		=#{receiveNo})
+	</select>
+	<!-- 구독 토글 -->
+	<update id="changeSubscribe" parameterType="hashmap">
+		update tbl_subscribe set status=#{status} where sendNo=#{sendNo} and receiveNo=#{receiveNo}
+	</update>
+</mapper>

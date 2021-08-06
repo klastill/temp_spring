@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context-4.3.xsd">
+		
+	<beans:bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	<beans:bean id="memberAuthDetailService" class="com.myweb.service.MemberAuthDetailService"/>
+	<beans:bean id="loginFailureHandler" class="com.myweb.handler.LoginFailureHandler">
+		<!-- loginFailureHandler라는 클래스를 만들고 getter(return memberID)와 setter(String memberID)를 등록하는 value=던져지는 파라미터이름 login의 name값 -->
+		<beans:property name="authMemberID" value="memberID"/>
+		<beans:property name="authMemberPassword" value="memberPassword"/>
+		<beans:property name="errMsg" value="err_msg"/>
+		<beans:property name="failUrl" value="/member/login?error"/> 
+	</beans:bean>
+	<beans:bean id="loginSuccessHandler" class="com.myweb.handler.LoginSuccessHandler">
+		<beans:property name="authMemberID" value="memberID"/>
+		<beans:property name="authUrl" value="/"/>
+	</beans:bean>		
+	<security:http auto-config="true" use-expressions="true"> <!-- 시큐리티가 내부적으로 설정되어있는 것을 따르겠냐(auto-config) use=시큐리티 전용 태그도 쓸거냐(true) -->
+		<security:session-management><!--시큐리티가 세션을 어떻게 관리할 것인가 설정-->
+			<security:concurrency-control max-sessions="1" expired-url="/"/><!-- 세션을 하나만쓰게하는거 expired=누군가 요청하면 /로 보냄 -->	
+		</security:session-management>
+		<!-- jsp파일의 <input name="memberID"> 인풋의 네임값 (설정하지 않으면 디폴트는 username, password임) -->
+		<security:form-login username-parameter="memberID" password-parameter="memberPassword"
+		login-processing-url="/member/login" login-page="/member/login"
+		default-target-url="/"
+		authentication-failure-handler-ref="loginFailureHandler"
+		authentication-success-handler-ref="loginSuccessHandler"/>
+		<security:logout logout-url="/member/logout" logout-success-url="/"
+		invalidate-session="true"/>		
+	</security:http>
+	<!-- 시큐리티 인증매니저 -->
+	<security:authentication-manager>
+	<!-- 시큐리티 인증 설정(직접만들어야함) user-service-ref="memberAuthDetailService" db와 dao를이용해서 연결할 수 있게끔 만드는 것 임플리먼츠해서 사용하면됨-->
+		<security:authentication-provider user-service-ref="memberAuthDetailService">
+	<!-- 4가지방법 1.bCrypt(단방향으로 강력함,노멀한방법) 2.rsa(필터를커스터마이징해야함, 어려워) 3.일반적인암호화기법(security3.버전에는 썻으나 지금은버려짐) 4.커스터마이징기법(위험함) -->
+			<security:password-encoder ref="bCryptPasswordEncoder"/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+	<context:component-scan base-package="com.myweb"/>	
+	
+</beans:beans>

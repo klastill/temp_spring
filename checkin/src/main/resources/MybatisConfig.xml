@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.myweb.domain.CommentVO" alias="cvo"/>
+		<typeAlias type="com.myweb.domain.PageVO" alias="pgvo"/>
+		<typeAlias type="com.myweb.domain.subscribe.SubscribeVO" alias="svo"/>
+		<typeAlias type="com.myweb.domain.subscribe.SubscribeDTO" alias="sdto"/>
+		<typeAlias type="com.myweb.domain.review.ReviewVO" alias="rvo"/>
+		<typeAlias type="com.myweb.domain.cart.CartVO" alias="cavo"/>
+		<typeAlias type="com.myweb.domain.order.OrderVO" alias="ovo"/>
+		<typeAlias type="com.myweb.domain.order.OrderDTO" alias="odto"/>
+		<typeAlias type="com.myweb.domain.MemberVO" alias="mvo"/>
+		<typeAlias type="com.myweb.domain.like.LikeVO" alias="lvo"/>
+		<typeAlias type="com.myweb.domain.like.LikeDTO" alias="ldto"/>
+		<typeAlias type="com.myweb.domain.FilesVO" alias="fvo"/>
+		<typeAlias type="com.myweb.domain.wish.WishVO" alias="wvo"/>
+		<typeAlias type="com.myweb.domain.AlarmVO" alias="avo"/>
+	</typeAliases>
+</configuration>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LikeMapper">
+<!--좋아요 누르기  oracle-->
+<!-- <insert id="reg" parameterType="lvo">
+	insert into tbl_like
+	(likeNo,mno,rno,status) values (tbl_like_seq.nextval,#{mno},#{rno},1)
+</insert> -->
+
+<!--좋아요 누르기 mysql -->
+<insert id="reg" parameterType="lvo">
+	insert into tbl_like
+	(mno,rno,status) values (#{mno},#{rno},1)
+</insert>
+
+<!--리뷰 하나당 좋아요 리스트 -->
+<select id="list" parameterType="int" resultType="ldto">
+select * from view_like where reviewNo=#{rno} and status=1
+</select>
+
+<!--좋아요 체크  -->
+<select id="check" parameterType="lvo" resultType="lvo">
+select * from tbl_like where rno=#{rno} and mno=#{mno}
+</select>
+<!-- 좋아요 목록 페이지 -->
+	<select id="liketc" parameterType="int" resultType="int">
+	 select count(*) from tbl_like where rno=#{rno} and status= 1
+	</select>	
+<!--좋아요 목록페이지 oracle -->
+<!--   <select id="likelist" parameterType="hashmap" resultType="lvo">
+  	select * from (select /*+INDEX(tbl_comment PK_tbl_comment)*/
+  	rownum as rn,likeNo,rno,mno,status from tbl_like where rno=#{rno}
+  	<![CDATA[
+  	and rownum<=#{pageIndex}*10)
+  	where rn>(#{pageIndex}-1)*10
+  	]]>
+  </select>	 -->
+  
+  <!--좋아요 목록페이지 mysql -->
+  <select id="likelist" parameterType="hashmap" resultType="lvo">
+  	select * from tbl_like where rno=#{rno} order by likeNo desc 
+  	limit 10 offset (#{pageIndex}-1)*10
+  
+  </select>	
+
+<!--좋아요 토글  -->
+<update id="changeLike" parameterType="hashmap">
+		update tbl_like set status=#{status} where rno=#{rno} and mno=#{mno}
+</update>
+</mapper>

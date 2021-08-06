@@ -1,0 +1,247 @@
+create database checkin;
+
+CREATE TABLE tbl_member
+(
+    `mno`             Int(10)          NOT NULL    AUTO_INCREMENT, 
+    `memberID`        VARCHAR(45)      NOT NULL, 
+    `memberPassword`  VARCHAR(1000)    NOT NULL, 
+    `memberName`      VARCHAR(20)      NOT NULL, 
+    `memberGender`    VARCHAR(20)      NOT NULL, 
+    `memberEmail`     VARCHAR(45)      NOT NULL, 
+    `memberPhone`     VARCHAR(20)      NOT NULL    COMMENT '전화번호', 
+    `memberBirth`     VARCHAR(20)      NULL        COMMENT '생년월일', 
+    `mileage`         Int(10)          NULL        DEFAULT 0 COMMENT '마일리지', 
+    `zipcode`         VARCHAR(100)     NULL        COMMENT '우편번호', 
+    `roadAddress`     VARCHAR(300)     NULL        COMMENT '도로명주소', 
+    `addressDetail`   VARCHAR(300)     NULL        COMMENT '상세주소', 
+    `auth`            VARCHAR(10)      NOT NULL    DEFAULT 'MEM' COMMENT '인증', 
+    `enabled`         Int(1)           NOT NULL    DEFAULT 1 COMMENT '활성화', 
+    `failcnt`         Int(1)           NOT NULL    DEFAULT 0 COMMENT '시도횟수', 
+    CONSTRAINT PK_tbl_user PRIMARY KEY (mno)
+);
+
+ALTER TABLE tbl_member COMMENT '회원 테이블';
+
+
+-- tbl_review Table Create SQL
+CREATE TABLE tbl_review
+(
+    `rno`        Int(10)          NOT NULL    AUTO_INCREMENT, 
+    `mno`        Int(10)          NOT NULL, 
+    `memberID`   VARCHAR(20)      NOT NULL, 
+    `title`      VARCHAR(200)     NOT NULL, 
+    `content`    VARCHAR(2000)    NOT NULL, 
+    `regdate`    DATETIME             NOT NULL    DEFAULT current_timestamp(), 
+    `recommend`  Int(2)           NOT NULL    COMMENT '추천, 별점', 
+    `likey`      Int(10)          NOT NULL    DEFAULT 0 COMMENT '좋아요수', 
+    `bname`      VARCHAR(200)     NOT NULL, 
+    `link`       VARCHAR(200)     NOT NULL, 
+    `cover`      VARCHAR(200)     NOT NULL, 
+    `readCount`  Int(10)          NULL        DEFAULT 0, 
+    `isbn`       VARCHAR(10)      NOT NULL, 
+    CONSTRAINT PK_tbl_review PRIMARY KEY (rno)
+);
+
+ALTER TABLE tbl_review COMMENT '리뷰 테이블';
+
+
+-- tbl_order Table Create SQL
+CREATE TABLE tbl_order
+(
+    `orderNo`        Int(10)         NOT NULL    AUTO_INCREMENT COMMENT '결제번호', 
+    `memberID`       VARCHAR(45)     NOT NULL    COMMENT '아이디', 
+    `memberEmail`    VARCHAR(45)     NOT NULL    COMMENT '이메일', 
+    `price`          Int             NOT NULL    COMMENT '결제금액', 
+    `regdate`        DATETIME            NOT NULL    DEFAULT current_timestamp COMMENT '결제일', 
+    `phoneNum`       VARCHAR(20)     NOT NULL    COMMENT '연락처', 
+    `demand`         VARCHAR(200)    NULL        DEFAULT ' ' COMMENT '요청사항', 
+    `zipcode`        VARCHAR(100)    NOT NULL    COMMENT '우편번호', 
+    `roadAddress`    VARCHAR(300)    NOT NULL    COMMENT '주소', 
+    `addressDetail`  VARCHAR(300)    NULL        COMMENT '상세주소', 
+    `memberName`     VARCHAR(20)     NOT NULL, 
+    `mileage`        Int(10)         NULL        DEFAULT 0, 
+    CONSTRAINT PK_tbl_order PRIMARY KEY (orderNo)
+);
+
+ALTER TABLE tbl_order COMMENT '주문테이블';
+
+ALTER TABLE tbl_order
+    ADD CONSTRAINT FK_tbl_order_memberID_tbl_member_memberID FOREIGN KEY (memberID)
+        REFERENCES tbl_member (memberID) ON DELETE cascade ON UPDATE cascade;
+
+
+-- tbl_alarm Table Create SQL
+CREATE TABLE tbl_alarm
+(
+    `ano`        Int             NOT NULL    AUTO_INCREMENT, 
+    `alarmdata`  VARCHAR(500)    NOT NULL, 
+    `rnolink`    VARCHAR(20)     NULL, 
+    `status`     Int             NOT NULL    DEFAULT 0, 
+    `memberID`   VARCHAR(100)    NOT NULL, 
+    `regdate`    DATETIME            NOT NULL    DEFAULT current_timestamp, 
+    CONSTRAINT PK_tbl_alarm PRIMARY KEY (ano)
+);
+
+ALTER TABLE tbl_alarm
+    ADD CONSTRAINT FK_tbl_alarm_memberID_tbl_member_memberID FOREIGN KEY (memberID)
+        REFERENCES tbl_member (memberID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_files Table Create SQL
+CREATE TABLE tbl_files
+(
+    `uuid`     VARCHAR(200)     NOT NULL, 
+    `savedir`  VARCHAR(200)     NULL, 
+    `fname`    VARCHAR(1000)    NULL, 
+    `ftype`    Int(1)           NULL        DEFAULT 0, 
+    `mno`      Int(10)          NULL, 
+    CONSTRAINT PK_tbl_files PRIMARY KEY (uuid)
+);
+
+ALTER TABLE tbl_files
+    ADD CONSTRAINT FK_tbl_files_mno_tbl_member_mn FOREIGN KEY (mno)
+        REFERENCES tbl_member (mno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_orderinfo Table Create SQL
+CREATE TABLE tbl_orderinfo
+(
+    `idx`      Int             NOT NULL    AUTO_INCREMENT, 
+    `orderNo`  Int(10)         NOT NULL    COMMENT '결제번호', 
+    `isbn`     VARCHAR(10)     NOT NULL    COMMENT '도서번호', 
+    `qty`      Int(10)         NOT NULL    COMMENT '수량', 
+    `bname`    VARCHAR(200)    NOT NULL, 
+    `cover`    VARCHAR(200)    NULL, 
+    `price`    VARCHAR(20)     NOT NULL, 
+    `mileage`  Int(10)         NULL        DEFAULT 0, 
+    CONSTRAINT PK_tbl_orderinfo PRIMARY KEY (idx)
+);
+
+ALTER TABLE tbl_orderinfo
+    ADD CONSTRAINT FK_tbl_orderinfo_orderNo_tbl_order_orderNo FOREIGN KEY (orderNo)
+        REFERENCES tbl_order (orderNo) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_wish Table Create SQL
+CREATE TABLE tbl_wish
+(
+    `wishNo`       Int(10)          not null        AUTO_INCREMENT, 
+    `mno`          Int(10)          NULL, 
+    `bname`        VARCHAR(200)     NULL, 
+    `cover`        VARCHAR(200)     NULL, 
+    `price`        VARCHAR(200)      NULL, 
+    `isbn`         VARCHAR(20)      NOT NULL, 
+    `author`       VARCHAR(2000)    NULL, 
+    `DESCRIPTION`  VARCHAR(4000)    NULL, 
+    CONSTRAINT PK_tbl_wish PRIMARY KEY (wishNo)
+);
+
+ALTER TABLE tbl_wish COMMENT '위시리스트';
+
+ALTER TABLE tbl_wish
+    ADD CONSTRAINT FK_tbl_wish_mno_tbl_member_mno FOREIGN KEY (mno)
+        REFERENCES tbl_member (mno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_subscribe Table Create SQL
+CREATE TABLE tbl_subscribe
+(
+    `subNo`      Int(10)    NOT NULL    AUTO_INCREMENT, 
+    `sendNo`     Int(10)    NOT NULL    COMMENT '구독을 누른 사람', 
+    `receiveNo`  Int(10)    NOT NULL    COMMENT '구독을 당한 사람', 
+    `status`     Int(1)     NOT NULL    DEFAULT 0 COMMENT '상태',
+     CONSTRAINT PK_tbl_subscribe PRIMARY KEY (subNo)
+);
+
+ALTER TABLE tbl_subscribe COMMENT '구독/멤버';
+
+ALTER TABLE tbl_subscribe
+    ADD CONSTRAINT FK_tbl_subscribe_sendNo_tbl_member_mno FOREIGN KEY (sendNo)
+        REFERENCES tbl_member (mno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tbl_subscribe
+    ADD CONSTRAINT FK_tbl_subscribe_receiveNo_tbl_member_mno FOREIGN KEY (receiveNo)
+        REFERENCES tbl_member (mno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_like Table Create SQL
+CREATE TABLE tbl_like
+(
+    `likeNo`  Int(10)    NOT NULL    AUTO_INCREMENT, 
+    `mno`     Int(10)    NOT NULL, 
+    `rno`     Int(10)    NOT NULL, 
+    `status`  Int(1)     NOT NULL    DEFAULT 0 COMMENT '상태',
+    CONSTRAINT PK_tbl_like PRIMARY KEY (likeNo)
+);
+
+ALTER TABLE tbl_like COMMENT '좋아요 누른 사람들';
+
+ALTER TABLE tbl_like
+    ADD CONSTRAINT FK_tbl_like_mno_tbl_member_mno FOREIGN KEY (mno)
+        REFERENCES tbl_member (mno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tbl_like
+    ADD CONSTRAINT FK_tbl_like_rno_tbl_review_rno FOREIGN KEY (rno)
+        REFERENCES tbl_review (rno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_cart Table Create SQL
+CREATE TABLE tbl_cart
+(
+    `cartNo`    Int(10)         NOT NULL    AUTO_INCREMENT, 
+    `memberID`  VARCHAR(45)     NOT NULL, 
+    `bname`     VARCHAR(200)    NOT NULL, 
+    `isbn`      VARCHAR(10)     NOT NULL, 
+    `price`     VARCHAR(20)     NOT NULL, 
+    `qty`       Int(10)         NOT NULL    COMMENT '수량', 
+    `regdate`   DATETIME            NOT NULL    DEFAULT current_timestamp COMMENT '등록일', 
+    `cover`     VARCHAR(200)    NULL, 
+    CONSTRAINT PK_tbl_cart PRIMARY KEY (cartNo)
+);
+
+ALTER TABLE tbl_cart COMMENT '장바구니';
+
+ALTER TABLE tbl_cart
+    ADD CONSTRAINT FK_tbl_cart_memberID_tbl_member_memberID FOREIGN KEY (memberID)
+        REFERENCES tbl_member (memberID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+-- tbl_comment Table Create SQL
+CREATE TABLE tbl_comment
+(
+    `cno`      Int(10)          NOT NULL    AUTO_INCREMENT, 
+    `rno`      Int(10)          NOT NULL, 
+    `cmt`      VARCHAR(1000)    NOT NULL, 
+    `writer`   VARCHAR(45)      NOT NULL    COMMENT '아이디', 
+    `cmtdate`  DATETIME             NOT NULL    DEFAULT current_timestamp, 
+    CONSTRAINT PK_tbl_comment PRIMARY KEY (cno)
+);
+
+ALTER TABLE tbl_comment COMMENT '댓글';
+
+ALTER TABLE tbl_comment
+    ADD CONSTRAINT FK_tbl_comment_rno_tbl_review_rno FOREIGN KEY (rno)
+        REFERENCES tbl_review (rno) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE tbl_comment
+    ADD CONSTRAINT FK_tbl_comment_writer_tbl_member_memberID FOREIGN KEY (writer)
+        REFERENCES tbl_member (memberID) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+alter table tbl_review modify column content varchar(4000) not null;
+alter table tbl_review add column content2 varchar(4000);
+alter table tbl_cart add  column mileage int(10);
+
+
+create view view_like as select l.rno as ReviewNo, 
+l.mno as memberNo, m.memberName as memberNickname, 
+ m.memberID as memberID,l.status as status from tbl_like l inner join tbl_member m on l.mno=m.mno;
+
+
+create view view_subscribe as select s.sendNo as sendNo, m.memberID as sendId, m.memberName as sendNickname,
+(SELECT count(*) AS followerNum from tbl_SUBSCRIBE s2 where s2.sendNo =s.sendNo and status =1) AS sendFollowingNum,
+(SELECT count(*) AS followerNum from tbl_SUBSCRIBE s2 where s2.RECEIVENO =s.SENDNO and status =1) AS sendFollowerNum,
+s.receiveNo as receiveNo, me.memberID as receiveId , me.memberName as receiveNickname ,
+(SELECT count(*) AS followerNum from TBL_SUBSCRIBE s2 where s2.SENDNO =s.RECEIVENO and status =1) AS receiveFollowingNum,
+(SELECT count(*) AS followerNum from TBL_SUBSCRIBE s2 where s2.RECEIVENO =s.RECEIVENO and status =1) AS receiveFollowerNum,
+s.status as status from tbl_subscribe s
+inner join tbl_member m on s.sendNo = m.mno inner join tbl_member me on s.receiveNo = me.mno ;

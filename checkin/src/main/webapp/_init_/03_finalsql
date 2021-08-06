@@ -1,0 +1,361 @@
+-- tbl_member Table Create SQL
+CREATE TABLE tbl_member
+(
+    mno               NUMBER(10)        NOT NULL, 
+    memberID          VARCHAR2(100)     NOT NULL, 
+    memberPassword    VARCHAR2(1000)    NOT NULL, 
+    memberName        VARCHAR2(20)      NOT NULL, 
+    memberGender      VARCHAR2(20)      NOT NULL, 
+    memberEmail       VARCHAR2(45)      NOT NULL, 
+    memberPhone       VARCHAR2(20)      NOT NULL, 
+    memberBirth       VARCHAR2(20)      NULL, 
+    mileage           NUMBER(10)        DEFAULT 0 NULL, 
+    zipcode           VARCHAR2(100)     NULL, 
+    roadAddress       VARCHAR2(300)     NULL, 
+    addressDetail     VARCHAR2(300)     NULL, 
+    auth              VARCHAR2(10)      DEFAULT 'MEM' NOT NULL, 
+    enabled           NUMBER(1)         DEFAULT 1 NOT NULL, 
+    failcnt           NUMBER(1)         DEFAULT 0 NOT NULL, 
+    CONSTRAINT PK_tbl_user PRIMARY KEY (mno)
+);
+/
+
+CREATE SEQUENCE tbl_member_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_member_AI_TRG
+BEFORE INSERT ON tbl_member 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_member_SEQ.NEXTVAL
+    INTO :NEW.mno
+    FROM DUAL;
+END;
+/
+
+-- tbl_review Table Create SQL
+CREATE TABLE tbl_review
+(
+    rno          NUMBER(10)        NOT NULL, 
+    mno          NUMBER(10)        NOT NULL, 
+    memberID     VARCHAR2(20)      NOT NULL, 
+    title        VARCHAR2(200)     NOT NULL, 
+    content      VARCHAR2(2000)    NOT NULL, 
+    regdate      DATE              DEFAULT sysdate NOT NULL, 
+    recommend    NUMBER(2)         NOT NULL, 
+    likey        NUMBER(10)        DEFAULT 0 NOT NULL, 
+    bname        VARCHAR2(200)     NOT NULL, 
+    link         VARCHAR2(200)     NOT NULL, 
+    cover        VARCHAR2(200)     NOT NULL, 
+    readCount    NUMBER(10)        DEFAULT 0 NULL, 
+    isbn         varchar2(10)      NOT NULL, 
+    CONSTRAINT PK_tbl_review PRIMARY KEY (rno)
+);
+/
+
+CREATE SEQUENCE tbl_review_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_review_AI_TRG
+BEFORE INSERT ON tbl_review 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_review_SEQ.NEXTVAL
+    INTO :NEW.rno
+    FROM DUAL;
+END;
+/
+
+
+-- tbl_comment Table Create SQL
+CREATE TABLE tbl_comment
+(
+    cno        NUMBER(10)        NOT NULL, 
+    rno        NUMBER(10)        NOT NULL, 
+    cmt        VARCHAR2(1000)    NOT NULL, 
+    writer     VARCHAR2(20)      NOT NULL, 
+    cmtdate    DATE              DEFAULT sysdate NOT NULL, 
+    CONSTRAINT PK_tbl_comment PRIMARY KEY (cno)
+);
+/
+
+CREATE SEQUENCE tbl_comment_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_comment_AI_TRG
+BEFORE INSERT ON tbl_comment 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_comment_SEQ.NEXTVAL
+    INTO :NEW.cno
+    FROM DUAL;
+END;
+/
+
+-- tbl_cart Table Create SQL
+CREATE TABLE tbl_cart
+(
+    cartNo      NUMBER(10)       NOT NULL, 
+    memberID    VARCHAR2(20)     NOT NULL, 
+    bname       VARCHAR2(200)    NOT NULL, 
+    isbn        varchar2(10)     NOT NULL, 
+    price       VARCHAR2(20)     NOT NULL, 
+    qty         NUMBER(10)       NOT NULL, 
+    regdate     DATE             DEFAULT sysdate NOT NULL, 
+    cover       varchar2(200)    NULL, 
+    CONSTRAINT PK_tbl_cart PRIMARY KEY (cartNo)
+);
+/
+
+CREATE SEQUENCE tbl_cart_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_cart_AI_TRG
+BEFORE INSERT ON tbl_cart 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_cart_SEQ.NEXTVAL
+    INTO :NEW.cartNo
+    FROM DUAL;
+END;
+/
+
+
+
+-- tbl_like Table Create SQL
+CREATE TABLE tbl_like
+(
+    likeNo    NUMBER(10)    NOT NULL, 
+    mno       NUMBER(10)    NOT NULL, 
+    rno       NUMBER(10)    NOT NULL, 
+    status    NUMBER(1)     DEFAULT 0 NOT NULL
+);
+/
+
+CREATE SEQUENCE tbl_like_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_like_AI_TRG
+BEFORE INSERT ON tbl_like 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_like_SEQ.NEXTVAL
+    INTO :NEW.likeNo
+    FROM DUAL;
+END;
+/
+
+
+-- tbl_order Table Create SQL
+CREATE TABLE tbl_order
+(
+    orderNo          NUMBER(10)       NOT NULL, 
+    memberID         VARCHAR2(45)     NOT NULL, 
+    memberEmail      VARCHAR2(45)     NOT NULL, 
+    price            NUMBER           NOT NULL, 
+    regdate          DATE             DEFAULT sysdate NOT NULL, 
+    phoneNum         VARCHAR2(20)     NOT NULL, 
+    demand           VARCHAR2(200)    DEFAULT ' ' NULL, 
+    zipcode          VARCHAR2(100)    NOT NULL, 
+    roadAddress      VARCHAR2(300)    NOT NULL, 
+    addressDetail    VARCHAR2(300)    NULL, 
+    memberName       VARCHAR2(20)     NOT NULL, 
+    mileage          NUMBER(10)       DEFAULT 0 NULL, 
+    CONSTRAINT PK_tbl_order PRIMARY KEY (orderNo)
+);
+/
+
+CREATE SEQUENCE tbl_order_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_order_AI_TRG
+BEFORE INSERT ON tbl_order 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_order_SEQ.NEXTVAL
+    INTO :NEW.orderNo
+    FROM DUAL;
+END;
+/
+
+
+-- tbl_subscribe Table Create SQL
+CREATE TABLE tbl_subscribe
+(
+    subNo        NUMBER(10)    NOT NULL, 
+    sendNo       NUMBER(10)    NOT NULL, 
+    receiveNo    NUMBER(10)    NOT NULL, 
+    status       NUMBER(1)     DEFAULT 0 NOT NULL
+);
+/
+
+CREATE SEQUENCE tbl_subscribe_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_subscribe_AI_TRG
+BEFORE INSERT ON tbl_subscribe 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_subscribe_SEQ.NEXTVAL
+    INTO :NEW.subNo
+    FROM DUAL;
+END;
+/
+
+create view view_like as select l.rno as ReviewNo, 
+l.mno as memberNo, m.memberName as memberNickname, 
+ m.memberID as memberID,l.status as status from tbl_like l inner join tbl_member m on l.mno=m.mno;
+
+
+create view view_subscribe as select s.sendNo as sendNo, m.memberID as sendId, m.memberName as sendNickname,
+(SELECT count(*) AS followerNum from tbl_SUBSCRIBE s2 where s2.sendNo =s.sendNo and status =1) AS sendFollowingNum,
+(SELECT count(*) AS followerNum from tbl_SUBSCRIBE s2 where s2.RECEIVENO =s.SENDNO and status =1) AS sendFollowerNum,
+s.receiveNo as receiveNo, me.memberID as receiveId , me.memberName as receiveNickname ,
+(SELECT count(*) AS followerNum from TBL_SUBSCRIBE s2 where s2.SENDNO =s.RECEIVENO and status =1) AS receiveFollowingNum,
+(SELECT count(*) AS followerNum from TBL_SUBSCRIBE s2 where s2.RECEIVENO =s.RECEIVENO and status =1) AS receiveFollowerNum,
+s.status as status from tbl_subscribe s
+inner join tbl_member m on s.sendNo = m.mno inner join tbl_member me on s.receiveNo = me.mno ;
+
+
+
+
+-- tbl_wish Table Create SQL
+CREATE TABLE tbl_wish
+(
+    wishNo         NUMBER(10)        NULL, 
+    mno            NUMBER(10)        NULL, 
+    bname          VARCHAR2(200)     NULL, 
+    cover          VARCHAR2(200)     NULL, 
+    price          VARCHAR2(200)      NULL, 
+    isbn           VARCHAR2(20)      NOT NULL, 
+    author         VARCHAR2(2000)    NULL, 
+    DESCRIPTION    VARCHAR2(4000)    NULL, 
+    CONSTRAINT PK_tbl_wish PRIMARY KEY (wishNo)
+);
+/
+
+CREATE SEQUENCE tbl_wish_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_wish_AI_TRG
+BEFORE INSERT ON tbl_wish 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_wish_SEQ.NEXTVAL
+    INTO :NEW.wishNo
+    FROM DUAL;
+END;
+/
+
+
+
+
+
+-- tbl_orderinfo Table Create SQL
+CREATE TABLE tbl_orderinfo
+(
+    idx        NUMBER           NOT NULL, 
+    orderNo    VARCHAR2(20)     NOT NULL, 
+    isbn       varchar2(10)     NOT NULL, 
+    qty        NUMBER(10)       NOT NULL, 
+    bname      VARCHAR2(200)    NOT NULL, 
+    cover      varchar2(200)    NULL, 
+    price      VARCHAR2(20)     NOT NULL, 
+    mileage    NUMBER(10)       DEFAULT 0 NULL, 
+    CONSTRAINT PK_tbl_orderinfo PRIMARY KEY (idx)
+);
+/
+
+CREATE SEQUENCE tbl_orderinfo_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_orderinfo_AI_TRG
+BEFORE INSERT ON tbl_orderinfo 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_orderinfo_SEQ.NEXTVAL
+    INTO :NEW.idx
+    FROM DUAL;
+END;
+/
+
+
+-- tbl_files Table Create SQL
+CREATE TABLE tbl_files
+(
+    uuid       varchar2(200)     NOT NULL, 
+    savedir    VARCHAR2(200)     NULL, 
+    fname      VARCHAR2(1000)    NULL, 
+    ftype      number(1)         DEFAULT 0 NULL, 
+    mno        NUMBER(10)        NULL, 
+     PRIMARY KEY (uuid)
+);
+/
+
+ALTER TABLE tbl_files
+    ADD CONSTRAINT FK_tbl_files_mno_tbl_member_mn FOREIGN KEY (mno)
+        REFERENCES tbl_member (mno) on delete cascade;
+/
+
+ALTER TABLE SPRINGPROJECT.TBL_CART ADD mileage number(10) DEFAULT 0;
+ALTER TABLE SPRINGPROJECT.TBL_MEMBER MODIFY MILEAGE NUMBER(10,0) DEFAULT 500;
+
+alter table tbl_member add fname varchar(200);
+
+ALTER TABLE SPRINGPROJECT.TBL_REVIEW ADD content2 varchar2(4000);
+
+-- tbl_alarm Table Create SQL
+CREATE TABLE tbl_alarm
+(
+    ano        NUMBER(10)          NOT NULL, 
+    alarmdata       VARCHAR2(500)    NOT NULL, 
+    rnolink    VARCHAR2(20)    NULL, 
+    status     NUMBER(10)          DEFAULT 0 NOT NULL, 
+    regdate DATE DEFAULT sysdate NOT null,
+     PRIMARY KEY (ano)
+);
+/
+
+CREATE SEQUENCE tbl_alarm_SEQ
+START WITH 1
+INCREMENT BY 1;
+/
+
+CREATE OR REPLACE TRIGGER tbl_alarm_AI_TRG
+BEFORE INSERT ON tbl_alarm 
+REFERENCING NEW AS NEW FOR EACH ROW 
+BEGIN 
+    SELECT tbl_alarm_SEQ.NEXTVAL
+    INTO :NEW.ano
+    FROM DUAL;
+END;/
+
+ALTER TABLE SPRINGPROJECT.TBL_alarm add memberID varchar2(100) NOT null;
+
+-----------------------------------------------------기존  fk 지우고 해주세요
+ 
+ALTER TABLE tbl_wish
+    ADD CONSTRAINT FK_tbl_wish_mno_tbl_member_mn FOREIGN KEY (mno)
+        REFERENCES tbl_member (mno) on delete cascade;
+
+ALTER TABLE tbl_files
+    ADD CONSTRAINT FK_tbl_files_mno_tbl_member_mn FOREIGN KEY (mno)
+        REFERENCES tbl_member (mno) on delete cascade;
